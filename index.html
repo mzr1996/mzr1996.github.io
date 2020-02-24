@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
@@ -44,6 +44,15 @@
   
 
 
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?889dc5df531897edeec98b635f03cd94";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
 
@@ -177,10 +186,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-02-23 21:25:13 / 修改时间：22:26:45" itemprop="dateCreated datePublished" datetime="2020-02-23T21:25:13+08:00">2020-02-23</time>
+              <time title="创建时间：2020-02-23 21:25:13" itemprop="dateCreated datePublished" datetime="2020-02-23T21:25:13+08:00">2020-02-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-25 01:31:44" itemprop="dateModified" datetime="2020-02-25T01:31:44+08:00">2020-02-25</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -203,72 +218,14 @@
 
       
           <p>原始论文：<a href="https://statweb.stanford.edu/~jhf/ftp/trebst.pdf" target="_blank" rel="noopener">Greedy Function Approximation: A Gradient Boosting Machine</a></p>
-<h3 id="优化问题">优化问题</h3>
-<p>定义输入为：<span class="math inline">\(\mathbf{x} = \left\{x_1, \cdots, x_n\right\}\)</span>，则训练样本为N个集合：<span class="math inline">\(\left\{y_i, \mathbf{x}_i\right\}_1^N\)</span></p>
-<p>预测函数为<span class="math inline">\(F(\mathbf{x})\)</span>，而希望获得的目标预测函数为<span class="math inline">\(F^*(\mathbf{x})\)</span>，定义损失函数为<span class="math inline">\(L(y, F(\mathbf{x}))\)</span></p>
-<p>则： <span class="math display">\[
-F^*(\mathbf{x}) = \arg\min_FE_{y,\mathbf{x}}L(y, F(\mathbf{x})) = \arg\min_FE_\mathbf{x}[E_yL(y, F(\mathbf{x})) | \mathbf{x}]
-\]</span> 式中使用了期望，是因为训练样本并非真实的<span class="math inline">\(\left\{y, \mathbf{x}\right\}\)</span>分布。</p>
-<p>当<span class="math inline">\(y\in\mathcal{R}^1\)</span>时，问题为回归问题，常用<span class="math inline">\(L(y, F)\)</span>为 <span class="math inline">\((y-F)^2\)</span> 和 <span class="math inline">\(\left|y-F\right|\)</span> 。</p>
-<p>当<span class="math inline">\(y\in\left\{-1, 1\right\}\)</span>时，问题为二分类问题，常用<span class="math inline">\(L(y, F)\)</span>为负对数损失函数（Logistic损失函数）<span class="math inline">\(\ln(1+e^{-yF})\)</span></p>
-<ul>
-<li><p>由于<span class="math inline">\(\ln(1+e^{-yF}) = -yF + \ln(1+e^{yF})\)</span>，也有使用后式表示Logistic损失函数的。</p></li>
-<li><p>Logistic函数指<span class="math inline">\(l(x)=\frac{1}{1+e^{-x}}\)</span>，取负对数为Logistic损失函数</p></li>
-<li><p>注意，这里的<span class="math inline">\(F\in(-\infty, +\infty)\)</span>，而不是<span class="math inline">\((-1, 1)\)</span>。</p>
-<ul>
-<li>当 <span class="math inline">\(y=1\)</span> 时，<span class="math inline">\(L=\ln(1+e^{-F})=-\ln l(F)\)</span></li>
-<li>当 <span class="math inline">\(y=-1\)</span> 时，<span class="math inline">\(L=\ln(1+e^F)=-\ln (1-l(F))\)</span></li>
-</ul></li>
-</ul>
-<p>因此，也有先取 <span class="math inline">\(F\)</span> 的Logistic函数 <span class="math inline">\(l(F)\)</span> ，再代入公式 <span class="math inline">\(L=-y\ln l(F) - (1-y) \ln (1-l(F))\)</span>计算Logistic损失函数的，注意此公式中<span class="math inline">\(y\in\left\{0, 1\right\}，l(F)\in(0,1)\)</span>。</p>
-<hr />
-<h3 id="参数拟合法">参数拟合法</h3>
-<p>给定了一个含参模型<span class="math inline">\(F(\mathbf{x};\mathbf{P})\)</span>，通过优化 <span class="math inline">\(\mathbf{P}\)</span> 来优化 <span class="math inline">\(F\)</span>。</p>
-<p>一种贪心的优化方法可以表述为以下流程：</p>
-<ul>
-<li><p>随机猜测初始参数<span class="math inline">\(\mathbf{P}_0\)</span>。</p></li>
-<li><p>计算使损失下降的梯度方向<span class="math inline">\(\mathbf{g}_m\)</span> <span class="math display">\[
-\mathbf{g}_m = \left\{g_{jm}\right\} = \left\{\left[\frac{\partial E_{y, \mathbf{x}}L(y, F(\mathbf{x};\mathbf{P}))}{\partial P_j}\right]_{\mathbf{P}=\mathbf{P}_{m-1}}\right\}
-\]</span></p></li>
-<li><p>计算梯度下降距离<span class="math inline">\(\rho_m\)</span>，使损失最小 <span class="math display">\[
-\rho_m = \arg\min_\rho E_{y, \mathbf{x}}L(y, F(\mathbf{x};\mathbf{P}_{m-1}-\rho \mathbf{g}_m))
-\]</span></p></li>
-<li><p>更新<span class="math inline">\(\mathbf{P}_m=\mathbf{P}_{m-1}-\rho\mathbf{g}_m\)</span></p></li>
-</ul>
-<hr />
-<h3 id="函数空间拟合法">函数空间拟合法</h3>
-<p>仿照参数拟合法的思路，可以优化<span class="math inline">\(F\)</span>。目标函数如下： <span class="math display">\[
-\Phi(F) = E_{y,\mathbf{x}}L(y, F(\mathbf{x}))=E_\mathbf{x}[E_yL(y, F(\mathbf{x})) | \mathbf{x}]
-\]</span> 而<span class="math inline">\(F(\mathbf{x})\)</span>可以视为对所有定义域中的<span class="math inline">\(\mathbf{x}\)</span>分别计算： <span class="math display">\[
-\phi(F(\mathbf{x}))=E_y\left[L(y,F(\mathbf{x})) |\mathbf{x}\right]
-\]</span> 思路如下：</p>
-<ul>
-<li><p>随机猜测初始函数<span class="math inline">\(F_0(x)\)</span>。</p></li>
-<li><p>计算使损失下降的梯度方向<span class="math inline">\(\mathbf{g}_m(x)\)</span> <span class="math display">\[
-\mathbf{g}_m(x) = \left[\frac{\partial\phi(F(\mathbf{x}))}{\partial F(\mathbf{x})}\right]_{F(\mathbf{x})=F_{m-1}(\mathbf{x})}=\left[\frac{\partial E_y\left[L(y,F(\mathbf{x})) |\mathbf{x}\right]}{\partial F(\mathbf{x})}\right]_{F(\mathbf{x})=F_{m-1}(\mathbf{x})}
-\]</span> 其中 <span class="math display">\[
-F_{m-1}(\mathbf{x})=\sum_{i=0}^{m-1}f_i(\mathbf{x})\\
-f_m(\mathbf{x})=-\rho_mg_m(\mathbf{x})
-\]</span></p></li>
-<li><p>计算梯度下降距离<span class="math inline">\(\rho_m\)</span>，使损失最小 <span class="math display">\[
-\rho_m = \arg\min_\rho E_{y, \mathbf{x}}L(y, F_{m-1}(\mathbf{x})-\rho g_m(\mathbf{x}))
-\]</span></p></li>
-<li><p>更新<span class="math inline">\(F_m(\mathbf{x})=F_{m-1}(\mathbf{x})+f_m(\mathbf{x})=F_{m-1}(\mathbf{x})-\rho_m\mathbf{g}_m(\mathbf{x})\)</span></p></li>
-</ul>
-<p>然而，该方法中尝试“对所有定义域中的<span class="math inline">\(\mathbf{x}\)</span>分别计算”，需要完全掌握所有<span class="math inline">\(\mathbf{x}\)</span>的分布，而实际中样本是有限的，必须对样本邻域进行平滑拟合。为了实现这一点，我们选定一个含参基函数（弱分类器）族<span class="math inline">\(h(\mathbf{x},\mathbf{a})\)</span>来代表<span class="math inline">\(f(\mathbf{x})\)</span>，即 <span class="math display">\[
-f_m(\mathbf{x})=\rho_mh(\mathbf{x},\mathbf{a}_m) \\
-F_m(\mathbf{x})=F_{m-1}(\mathbf{x})+f_m(\mathbf{x})
-\]</span> 为了求出参数<span class="math inline">\(\mathbf{a}_m\)</span>，我们对所有样本分别进行如下计算： <span class="math display">\[
--g_m(\mathbf{x}_i)=-\left[\frac{\partial L(y_i, F(\mathbf{x}_i))}{\partial F(\mathbf{x}_i)}\right]_{F(\mathbf{x})=F_{m-1}(\mathbf{x})}
-\]</span> 与前面的流程不同的是，这里求出的导数<span class="math inline">\(g_m(\mathbf{x}_i)\)</span>不能直接加到<span class="math inline">\(F_{m-1}(\mathbf{x})\)</span>上，因为我们已经限制了<span class="math inline">\(f(\mathbf{x})\)</span>要符合弱分类器族<span class="math inline">\(h(\mathbf{x},\mathbf{a})\)</span>，故进一步推导如下（注意此处使用最小二乘法，但也可以使用其他方法）： <span class="math display">\[
-\mathbf{a}_m = \arg\min_{\mathbf{a},\beta}\sum_{i=1}^N[-g_m(\mathbf{x}_i)-\beta h(\mathbf{x}_i;\mathbf{a})]^2
-\]</span> 即选取与导数方向最接近的<span class="math inline">\(h(\mathbf{x}_i;\mathbf{a}_m)\)</span>来代表导数。式中出现的<span class="math inline">\(\beta\)</span>应该是比例系数，不重要。</p>
-<p>之后使用线性搜索法，贪婪地确定系数： <span class="math display">\[
-\rho_m=\arg\min_\rho\sum_{i=1}^NL(y_i,F_{m-1}(\mathbf{x}_i)+\rho h(\mathbf{x}_i;\mathbf{a}_m))
-\]</span> 最后更新拟合函数： <span class="math display">\[
-F_m(\mathbf{x})=F_{m-1}(\mathbf{x})+\rho_mh(\mathbf{x};\mathbf{a}_m)
-\]</span></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/ck6z688vl0000a0hvf0y6awto/GBDT%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -416,7 +373,7 @@ F_m(\mathbf{x})=F_{m-1}(\mathbf{x})+\rho_mh(\mathbf{x};\mathbf{a}_m)
   </div>
 
   
-  <script src="//cdn.bootcss.com/animejs/3.1.0/anime.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
 
 <script src="/js/utils.js"></script>
 
